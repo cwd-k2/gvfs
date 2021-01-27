@@ -55,7 +55,7 @@ func traverse(path string, ignore *regexp.Regexp) (Item, error) {
 	contents := make([]Item, 0)
 
 	for _, child := range matched {
-		if ignore.MatchString(child) {
+		if ignore != nil && ignore.MatchString(child) {
 			continue
 		}
 
