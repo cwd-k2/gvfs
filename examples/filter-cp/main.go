@@ -36,7 +36,6 @@ func main() {
 
 	switch d := e.(type) {
 	case *gvfs.Directory:
-		println("move")
 		for _, e := range d.Contents {
 			if err := dst.WriteItem(e); err != nil {
 				println(err.Error())
