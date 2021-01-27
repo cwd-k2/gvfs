@@ -40,7 +40,7 @@ func (r *Root) ToItem(ignore *regexp.Regexp) (Item, error) {
 // The object's structure will be written under the Root's path.
 func (r *Root) WriteItem(e Item) error {
 	// err if the directory couldn't be created somehow
-	if err := os.MkdirAll(r.Path, 0755); err != nil && !os.IsExist(err) {
+	if err := os.MkdirAll(r.Path, os.ModePerm); err != nil && !os.IsExist(err) {
 		return err
 	}
 
