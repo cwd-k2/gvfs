@@ -29,18 +29,14 @@ func main() {
 
 	pat := regexp.MustCompile(os.Args[3])
 
-	e, err := src.ToItem(pat)
+	d, err := src.ToItem(pat)
 	if err != nil {
 		panic(err)
 	}
 
-	switch d := e.(type) {
-	case *gvfs.Directory:
-		for _, e := range d.Contents {
-			if err := dst.WriteItem(e); err != nil {
-				println(err.Error())
-			}
+	for _, e := range d.Contents {
+		if err := dst.WriteItem(e); err != nil {
+			println(err.Error())
 		}
 	}
-
 }

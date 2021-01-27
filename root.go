@@ -18,9 +18,9 @@ func NewRoot(path string) *Root {
 	return &Root{Path: path}
 }
 
-// Just convert this Root to Item struct.
-// The returned struct should be a Directory, that has the same path to this Root object.
-func (r *Root) ToItem(ignore *regexp.Regexp) (Item, error) {
+// Just convert this Root to Item struct (Directory).
+// The returned struct should be a Directory that has the same path to this Root object.
+func (r *Root) ToItem(ignore *regexp.Regexp) (*Directory, error) {
 	// ensure the r.Path points an existing directory
 	if info, err := os.Stat(r.Path); err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (r *Root) WriteItem(e Item) error {
 	return nil
 }
 
-func traverse(path string, ignore *regexp.Regexp) (Item, error) {
+func traverse(path string, ignore *regexp.Regexp) (*Directory, error) {
 	matched, err := filepath.Glob(filepath.Join(path, "*"))
 	if err != nil {
 		return nil, err
