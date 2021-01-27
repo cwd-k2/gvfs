@@ -11,6 +11,7 @@ type File struct {
 	Contents []byte
 }
 
+// Create an entity under the specified directory.
 func (f *File) Commit(parent string) error {
 	fp, err := os.Create(filepath.Join(parent, f.BaseName))
 	if err != nil {

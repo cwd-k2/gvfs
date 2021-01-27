@@ -10,6 +10,7 @@ type Directory struct {
 	Contents []Item
 }
 
+// Create an entity under the specified directory
 func (d *Directory) Commit(parent string) error {
 	dirname := filepath.Join(parent, d.BaseName)
 

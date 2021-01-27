@@ -9,6 +9,7 @@ import (
 	"regexp"
 )
 
+// Stands for a directory where we can read/write Item.
 type Root struct {
 	Path string
 }
@@ -17,6 +18,8 @@ func NewRoot(path string) *Root {
 	return &Root{Path: path}
 }
 
+// Just convert this Root to Item struct.
+// The returned struct should be a Directory, that has the same path to this Root object.
 func (r *Root) ToItem(ignore *regexp.Regexp) (Item, error) {
 	// ensure the r.Path points an existing directory
 	if info, err := os.Stat(r.Path); err != nil {
@@ -33,6 +36,8 @@ func (r *Root) ToItem(ignore *regexp.Regexp) (Item, error) {
 	return e, nil
 }
 
+// Write an Item object as a read entity.
+// The object's structure will be written under the Root's path.
 func (r *Root) WriteItem(e Item) error {
 	// err if the directory couldn't be created somehow
 	if err := os.MkdirAll(r.Path, 0755); err != nil && !os.IsExist(err) {
