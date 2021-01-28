@@ -12,6 +12,7 @@ import (
 func main() {
 	if len(os.Args) != 2 {
 		println("usage: godir <dirname>")
+		return
 	}
 
 	basename := filepath.Base(os.Args[1])
@@ -44,7 +45,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := gvfs.NewRoot(filepath.Dir(target)).WriteItem(directory); err != nil {
+	if err := directory.Commit(filepath.Dir(target)); err != nil {
 		panic(err)
 	}
 }
