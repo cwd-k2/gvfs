@@ -52,7 +52,7 @@ func (d *Directory) AttachFile(path *Path) (*File, error) {
 }
 
 // Create a new File at the given path to this Directory
-// returns the attached Item
+// returns the attached File
 func (d *Directory) CreateFile(path *Path) (*File, error) {
 	var item Item = nil
 
@@ -66,27 +66,59 @@ func (d *Directory) CreateFile(path *Path) (*File, error) {
 	if item == nil {
 		if path.Next != nil {
 			item = NewDirectory(path.Head)
+			d.Contents = append(d.Contents, item)
 		} else {
 			item = NewFile(path.Head)
+			d.Contents = append(d.Contents, item)
 		}
 	}
 
 	if path.Next == nil {
 		if file, ok := item.(*File); ok {
-			d.Contents = append(d.Contents, file)
 			return file, nil
 		} else {
-			return nil, errors.New(fmt.Sprintf("Cannot attach a File %s. A Directory named %s already exists.", path.Identity, path.Identity))
+			return nil, errors.New(fmt.Sprintf("Cannot create a File %s. A Directory named %s already exists.", path.Identity, path.Identity))
 		}
 	}
 
 	if subdir, ok := item.(*Directory); ok {
-		d.Contents = append(d.Contents, subdir)
 		return subdir.CreateFile(path.Next) // go recurse
+	} else {
+		return nil, errors.New(fmt.Sprintf("Cannot create a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
+	}
+
+}
+
+// Create a new Directory at the given path to this Directory
+// returns the created Directory
+func (d *Directory) CreateDirectory(path *Path) (*Directory, error) {
+	var item Item = nil
+
+	for _, c := range d.Contents {
+		if c.Name() == path.Head {
+			item = c
+		}
+	}
+
+	// item shouldn't be nil after this part
+	if item == nil {
+		item = NewDirectory(path.Head)
+		d.Contents = append(d.Contents, item)
+	}
+
+	if path.Next == nil {
+		if dir, ok := item.(*Directory); ok {
+			return dir, nil
+		} else {
+			return nil, errors.New(fmt.Sprintf("Cannot create a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
+		}
+	}
+
+	if subdir, ok := item.(*Directory); ok {
+		return subdir.CreateDirectory(path.Next) // go recurse
 	} else {
 		return nil, errors.New(fmt.Sprintf("Cannot creat a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
 	}
-
 }
 
 // Search an Item that has the given path

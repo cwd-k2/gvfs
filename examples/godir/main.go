@@ -12,23 +12,34 @@ import (
 func main() {
 	if len(os.Args) != 2 {
 		println("usage: godir <dirname>")
+		return
 	}
 
 	basename := filepath.Base(os.Args[1])
 	newfiles := []string{
 		"README.md",
 		fmt.Sprintf("cmd/%s/main.go", basename),
-		"pkg/.gitkeep",
-		"test/.gitkeep",
-		"examples/.gitkeep",
-		"internal/pkg/.gitkeep",
+	}
+
+	newdires := []string{
+		"pkg",
+		"test",
+		"examples",
+		"internal/pkg",
 	}
 
 	directory := gvfs.NewDirectory(basename)
 
 	for _, filename := range newfiles {
 		if _, err := directory.CreateFile(gvfs.NewPath(filename)); err != nil {
-			println("errors: attachfile")
+			println("errors: create-file")
+			println(err.Error())
+		}
+	}
+
+	for _, direname := range newdires {
+		if _, err := directory.CreateDirectory(gvfs.NewPath(direname)); err != nil {
+			println("errors: create-directory")
 			println(err.Error())
 		}
 	}
@@ -44,7 +55,7 @@ func main() {
 		panic(err)
 	}
 
-	if err := gvfs.NewRoot(filepath.Dir(target)).WriteItem(directory); err != nil {
+	if err := directory.Commit(filepath.Dir(target)); err != nil {
 		panic(err)
 	}
 }

@@ -8,6 +8,7 @@ const (
 )
 
 type Item interface {
+	// Commit itself to the real file system.
 	Commit(string) error
 	Kind() ItemKind
 	Name() string

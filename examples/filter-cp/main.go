@@ -24,19 +24,15 @@ func main() {
 		panic(err)
 	}
 
-	src := gvfs.NewRoot(srcDir)
-	dst := gvfs.NewRoot(dstDir)
-
 	pat := regexp.MustCompile(os.Args[3])
-
-	d, err := src.ToItem(pat)
+	src, err := gvfs.Traverse(srcDir, pat)
 	if err != nil {
 		panic(err)
 	}
 
-	for _, e := range d.Contents {
-		if err := dst.WriteItem(e); err != nil {
-			println(err.Error())
+	for _, content := range src.Contents {
+		if err := content.Commit(dstDir); err != nil {
+			println(err)
 		}
 	}
 }
