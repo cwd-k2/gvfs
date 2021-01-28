@@ -41,3 +41,13 @@ func (f *File) Kind() ItemKind {
 func (f *File) Name() string {
 	return f.BaseName
 }
+
+// Write the given []byte to the File
+func (f *File) Write(b []byte) (int, error) {
+	return bytes.NewBuffer(f.Contents).Read(b)
+}
+
+// Read File contents to the given []byte
+func (f *File) Read(b []byte) (int, error) {
+	return bytes.NewBuffer(b).Read(f.Contents)
+}
