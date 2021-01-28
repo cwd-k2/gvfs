@@ -19,17 +19,27 @@ func main() {
 	newfiles := []string{
 		"README.md",
 		fmt.Sprintf("cmd/%s/main.go", basename),
-		"pkg/.gitkeep",
-		"test/.gitkeep",
-		"examples/.gitkeep",
-		"internal/pkg/.gitkeep",
+	}
+
+	newdires := []string{
+		"pkg",
+		"test",
+		"examples",
+		"internal/pkg",
 	}
 
 	directory := gvfs.NewDirectory(basename)
 
 	for _, filename := range newfiles {
 		if _, err := directory.CreateFile(gvfs.NewPath(filename)); err != nil {
-			println("errors: attachfile")
+			println("errors: create-file")
+			println(err.Error())
+		}
+	}
+
+	for _, direname := range newdires {
+		if _, err := directory.CreateDirectory(gvfs.NewPath(direname)); err != nil {
+			println("errors: create-directory")
 			println(err.Error())
 		}
 	}
