@@ -36,7 +36,7 @@ func (r *Root) ToItem(ignore *regexp.Regexp) (*Directory, error) {
 	return d, nil
 }
 
-// Write an Item object as a read entity.
+// Write an Item object as a real filesystem entity.
 // The object's structure will be written under the Root's path.
 func (r *Root) WriteItem(i Item) error {
 	// err if the directory couldn't be created somehow
