@@ -11,6 +11,13 @@ type File struct {
 	Contents []byte
 }
 
+func NewFile(basename string) *File {
+	return &File{
+		BaseName: basename,
+		Contents: []byte{},
+	}
+}
+
 // Create an entity under the specified directory.
 func (f *File) Commit(parent string) error {
 	fp, err := os.Create(filepath.Join(parent, f.BaseName))
@@ -21,7 +28,7 @@ func (f *File) Commit(parent string) error {
 
 	b := bytes.NewBuffer(f.Contents)
 	if _, err := b.WriteTo(fp); err != nil {
-		return nil
+		return err
 	}
 
 	return nil
@@ -29,4 +36,8 @@ func (f *File) Commit(parent string) error {
 
 func (f *File) Kind() ItemKind {
 	return FileItem
+}
+
+func (f *File) Name() string {
+	return f.BaseName
 }

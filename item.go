@@ -10,4 +10,5 @@ const (
 type Item interface {
 	Commit(string) error
 	Kind() ItemKind
+	Name() string
 }
