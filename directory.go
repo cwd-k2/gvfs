@@ -23,11 +23,7 @@ func NewDirectory(basename string) *Directory {
 func (d *Directory) Commit(parent string) error {
 	dirname := filepath.Join(parent, d.BaseName)
 	// mkdir -p in case of the parent directory doesn't exist
-	if _, err := os.Stat(dirname); os.IsNotExist(err) {
-		if err := os.MkdirAll(dirname, os.ModePerm); err != nil {
-			return err
-		}
-	} else if err != nil {
+	if err := os.MkdirAll(dirname, os.ModePerm); err != nil {
 		return err
 	}
 

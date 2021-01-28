@@ -21,11 +21,7 @@ func NewFile(basename string) *File {
 // Create an entity under the specified directory.
 func (f *File) Commit(parent string) error {
 	// make sure the parent exists
-	if _, err := os.Stat(parent); os.IsNotExist(err) {
-		if err := os.MkdirAll(parent, os.ModePerm); err != nil {
-			return err
-		}
-	} else if err != nil {
+	if err := os.MkdirAll(parent, os.ModePerm); err != nil {
 		return err
 	}
 
