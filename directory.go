@@ -71,7 +71,7 @@ func (d *Directory) AttachFile(path *Path) (*File, error) {
 			d.Contents = append(d.Contents, file)
 			return file, nil
 		} else {
-			return nil, errors.New(fmt.Sprintf("Cannot attach a File %s. A Directory named %s already exists.", item.Name(), item.Name()))
+			return nil, errors.New(fmt.Sprintf("Cannot attach a File %s. A Directory named %s already exists.", path.Identity, path.Identity))
 		}
 	}
 
@@ -79,13 +79,12 @@ func (d *Directory) AttachFile(path *Path) (*File, error) {
 		d.Contents = append(d.Contents, subdir)
 		return subdir.AttachFile(path.Next) // go recurse
 	} else {
-		return nil, errors.New(fmt.Sprintf("Cannot creat a Directory %s. A File named %s already exists.", item.Name(), item.Name()))
+		return nil, errors.New(fmt.Sprintf("Cannot creat a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
 	}
 
 }
 
 // Search an Item that has the given path
-// If not found, then nil will be returned, without errors
 func (d *Directory) Search(path *Path) (Item, error) {
 	var item Item = nil
 
@@ -95,13 +94,31 @@ func (d *Directory) Search(path *Path) (Item, error) {
 		}
 	}
 
-	if item == nil || path.Next == nil {
+	if item != nil && path.Next == nil {
 		return item, nil
+	}
+
+	if item == nil {
+		return nil, errors.New(fmt.Sprintf("Item %s not found.", path.Identity))
 	}
 
 	if subdir, ok := item.(*Directory); ok {
 		return subdir.Search(path.Next) // go recurse
 	} else {
-		return nil, errors.New(fmt.Sprintf("Item %s is not a Directory. Cannot go deeper.", item.Name()))
+		return nil, errors.New(fmt.Sprintf("Item %s is not a Directory. Cannot go deeper.", path.Identity))
+	}
+}
+
+// Search an File that has the given path
+func (d *Directory) SearchFile(path *Path) (*File, error) {
+	item, err := d.Search(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if file, ok := item.(*File); ok {
+		return file, nil
+	} else {
+		return nil, errors.New(fmt.Sprintf("%s is not a File, but a Directory.", path.Identity))
 	}
 }

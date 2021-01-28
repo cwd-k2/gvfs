@@ -6,23 +6,31 @@ import (
 )
 
 type Path struct {
-	Head string
-	Next *Path
+	Identity string
+	Head     string
+	Next     *Path
 }
 
 func NewPath(path string) *Path {
-	if path == "" {
-		return &Path{Head: "", Next: nil}
-	}
-
+	// strings.Split() returns 1> elements slice
 	list := strings.Split(filepath.Clean(path), string(filepath.Separator))
-	return newpath(list)
+	return newpath("", list)
 }
 
-func newpath(ps []string) *Path {
+func newpath(parent string, ps []string) *Path {
+	// surely, len(ps) > 0
+	dirname := filepath.Join(parent, ps[0])
 	if len(ps) > 1 {
-		return &Path{Head: ps[0], Next: newpath(ps[1:])}
+		return &Path{
+			Identity: dirname,
+			Head:     ps[0],
+			Next:     newpath(dirname, ps[1:]),
+		}
 	} else {
-		return &Path{Head: ps[0], Next: nil}
+		return &Path{
+			Identity: dirname,
+			Head:     ps[0],
+			Next:     nil,
+		}
 	}
 }
