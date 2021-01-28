@@ -27,7 +27,7 @@ func main() {
 	directory := gvfs.NewDirectory(basename)
 
 	for _, filename := range newfiles {
-		if _, err := directory.AttachFile(gvfs.NewPath(filename)); err != nil {
+		if _, err := directory.CreateFile(gvfs.NewPath(filename)); err != nil {
 			println("errors: attachfile")
 			println(err.Error())
 		}
