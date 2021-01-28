@@ -18,10 +18,11 @@ func (d *Directory) Commit(parent string) error {
 		return err
 	}
 
-	for _, contents := range d.Contents {
-		err := contents.Commit(dirname)
+	for _, c := range d.Contents {
+		err := c.Commit(dirname)
 		if err != nil {
-			return err
+			println(err.Error())
+			continue
 		}
 	}
 
