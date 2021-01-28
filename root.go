@@ -28,23 +28,23 @@ func (r *Root) ToItem(ignore *regexp.Regexp) (*Directory, error) {
 		return nil, errors.New(fmt.Sprintf("%s is not a directory.", r.Path))
 	}
 
-	e, err := traverse(r.Path, ignore)
+	d, err := traverse(r.Path, ignore)
 	if err != nil {
 		return nil, err
 	}
 
-	return e, nil
+	return d, nil
 }
 
 // Write an Item object as a read entity.
 // The object's structure will be written under the Root's path.
-func (r *Root) WriteItem(e Item) error {
+func (r *Root) WriteItem(i Item) error {
 	// err if the directory couldn't be created somehow
 	if err := os.MkdirAll(r.Path, os.ModePerm); err != nil && !os.IsExist(err) {
 		return err
 	}
 
-	if err := e.Commit(r.Path); err != nil {
+	if err := i.Commit(r.Path); err != nil {
 		println(err.Error())
 	}
 
