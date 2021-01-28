@@ -46,9 +46,14 @@ func (d *Directory) Name() string {
 	return d.BaseName
 }
 
-// Attach a new File at the given path to this Directory
-// returns the attached Item
+// Deprecated: AttachFile is now named CreateFile
 func (d *Directory) AttachFile(path *Path) (*File, error) {
+	return d.CreateFile(path)
+}
+
+// Create a new File at the given path to this Directory
+// returns the attached Item
+func (d *Directory) CreateFile(path *Path) (*File, error) {
 	var item Item = nil
 
 	for _, c := range d.Contents {
@@ -77,7 +82,7 @@ func (d *Directory) AttachFile(path *Path) (*File, error) {
 
 	if subdir, ok := item.(*Directory); ok {
 		d.Contents = append(d.Contents, subdir)
-		return subdir.AttachFile(path.Next) // go recurse
+		return subdir.CreateFile(path.Next) // go recurse
 	} else {
 		return nil, errors.New(fmt.Sprintf("Cannot creat a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
 	}
