@@ -51,6 +51,11 @@ func (d *Directory) AttachFile(path *Path) (*File, error) {
 	return d.CreateFile(path)
 }
 
+// Appending the Item(s) as the Directory's contents
+func (d *Directory) AppendItem(item ...Item) {
+	d.Contents = append(d.Contents, item...)
+}
+
 // Create a new File at the given path to this Directory
 // returns the attached File
 func (d *Directory) CreateFile(path *Path) (*File, error) {
