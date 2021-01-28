@@ -22,8 +22,12 @@ func NewDirectory(basename string) *Directory {
 // Create an entity under the specified directory
 func (d *Directory) Commit(parent string) error {
 	dirname := filepath.Join(parent, d.BaseName)
-
-	if err := os.MkdirAll(dirname, os.ModePerm); err != nil && !os.IsExist(err) {
+	// mkdir -p in case of the parent directory doesn't exist
+	if _, err := os.Stat(dirname); os.IsNotExist(err) {
+		if err := os.MkdirAll(dirname, os.ModePerm); err != nil {
+			return err
+		}
+	} else if err != nil {
 		return err
 	}
 
