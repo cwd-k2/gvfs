@@ -23,11 +23,7 @@ func NewDirectory(basename string) *Directory {
 func (d *Directory) Commit(parent string) error {
 	dirname := filepath.Join(parent, d.BaseName)
 	// mkdir -p in case of the parent directory doesn't exist
-	if _, err := os.Stat(dirname); os.IsNotExist(err) {
-		if err := os.MkdirAll(dirname, os.ModePerm); err != nil {
-			return err
-		}
-	} else if err != nil {
+	if err := os.MkdirAll(dirname, os.ModePerm); err != nil {
 		return err
 	}
 
@@ -53,6 +49,35 @@ func (d *Directory) Name() string {
 // Deprecated: AttachFile is now named CreateFile
 func (d *Directory) AttachFile(path *Path) (*File, error) {
 	return d.CreateFile(path)
+}
+
+// Appending the Item(s) as the Directory's contents
+func (d *Directory) AppendItem(items ...Item) {
+item_loop:
+	for _, item := range items {
+		for _, content := range d.Contents {
+			// check for same name
+			// dir  & dir  -> recurse AppendItem
+			// file & file -> override
+			// otherwise   -> ignore
+			if content.Name() == item.Name() {
+				switch item := item.(type) {
+				case *Directory: // recurse
+					if content, ok := content.(*Directory); ok {
+						content.AppendItem(item.Contents...)
+					}
+				case *File: // override
+					if _, ok := content.(*File); ok {
+						content = item
+					}
+				}
+				// skip anyway
+				continue item_loop
+			}
+		}
+		// you can safely append this item here
+		d.Contents = append(d.Contents, item)
+	}
 }
 
 // Create a new File at the given path to this Directory
