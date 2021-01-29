@@ -15,7 +15,13 @@ func main() {
 		return
 	}
 
-	basename := filepath.Base(os.Args[1])
+	target, err := filepath.Abs(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+
+	basename, dirname := filepath.Split(target)
+
 	newfiles := []string{
 		"README.md",
 		fmt.Sprintf("cmd/%s/main.go", basename),
@@ -50,12 +56,7 @@ func main() {
 		println(string(b))
 	}
 
-	target, err := filepath.Abs(os.Args[1])
-	if err != nil {
-		panic(err)
-	}
-
-	if err := directory.Commit(filepath.Dir(target)); err != nil {
+	if err := directory.Commit(dirname); err != nil {
 		panic(err)
 	}
 }
