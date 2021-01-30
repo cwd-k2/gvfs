@@ -50,14 +50,18 @@ func (d *Directory) AttachFile(path *Path) (*File, error) {
 	return d.CreateFile(path)
 }
 
-// Appending the Item(s) as the Directory's contents
+// Appending the Item(s) as the Directory's contents.
+// Files will be overwritten.
+// Directories will be merged.
+// File and Directory that have the same path, untouched.
+// TODO: Test
 func (d *Directory) AppendItem(items ...Item) {
 item_loop:
 	for _, item := range items {
 		for _, content := range d.Contents {
 			// check for same name
 			// dir  & dir  -> recurse AppendItem
-			// file & file -> override
+			// file & file -> overwrite
 			// otherwise   -> ignore
 			if content.Name() == item.Name() {
 				switch item := item.(type) {
@@ -174,7 +178,7 @@ func (d *Directory) Search(path *Path) (Item, error) {
 	}
 }
 
-// Search an File that has the given path
+// Search a File that has the given path
 func (d *Directory) SearchFile(path *Path) (*File, error) {
 	item, err := d.Search(path)
 	if err != nil {
@@ -185,5 +189,19 @@ func (d *Directory) SearchFile(path *Path) (*File, error) {
 		return file, nil
 	} else {
 		return nil, fmt.Errorf("%s is not a File, but a Directory.", path.Identity)
+	}
+}
+
+// Search a Directory that has the given path
+func (d *Directory) SearchDirectory(path *Path) (*Directory, error) {
+	item, err := d.Search(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if directory, ok := item.(*Directory); ok {
+		return directory, nil
+	} else {
+		return nil, fmt.Errorf("%s is not a Directory, but a File.", path.Identity)
 	}
 }
