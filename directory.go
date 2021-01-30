@@ -1,7 +1,6 @@
 package gvfs
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -51,14 +50,18 @@ func (d *Directory) AttachFile(path *Path) (*File, error) {
 	return d.CreateFile(path)
 }
 
-// Appending the Item(s) as the Directory's contents
+// Appending the Item(s) as the Directory's contents.
+// Files will be overwritten.
+// Directories will be merged.
+// File and Directory that have the same path, untouched.
+// TODO: Test
 func (d *Directory) AppendItem(items ...Item) {
 item_loop:
 	for _, item := range items {
 		for _, content := range d.Contents {
 			// check for same name
 			// dir  & dir  -> recurse AppendItem
-			// file & file -> override
+			// file & file -> overwrite
 			// otherwise   -> ignore
 			if content.Name() == item.Name() {
 				switch item := item.(type) {
@@ -106,14 +109,14 @@ func (d *Directory) CreateFile(path *Path) (*File, error) {
 		if file, ok := item.(*File); ok {
 			return file, nil
 		} else {
-			return nil, errors.New(fmt.Sprintf("Cannot create a File %s. A Directory named %s already exists.", path.Identity, path.Identity))
+			return nil, fmt.Errorf("Cannot create a File %s. A Directory named %s already exists.", path.Identity, path.Identity)
 		}
 	}
 
 	if subdir, ok := item.(*Directory); ok {
 		return subdir.CreateFile(path.Next) // go recurse
 	} else {
-		return nil, errors.New(fmt.Sprintf("Cannot create a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
+		return nil, fmt.Errorf("Cannot create a Directory %s. A File named %s already exists.", path.Identity, path.Identity)
 	}
 
 }
@@ -139,14 +142,14 @@ func (d *Directory) CreateDirectory(path *Path) (*Directory, error) {
 		if dir, ok := item.(*Directory); ok {
 			return dir, nil
 		} else {
-			return nil, errors.New(fmt.Sprintf("Cannot create a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
+			return nil, fmt.Errorf("Cannot create a Directory %s. A File named %s already exists.", path.Identity, path.Identity)
 		}
 	}
 
 	if subdir, ok := item.(*Directory); ok {
 		return subdir.CreateDirectory(path.Next) // go recurse
 	} else {
-		return nil, errors.New(fmt.Sprintf("Cannot creat a Directory %s. A File named %s already exists.", path.Identity, path.Identity))
+		return nil, fmt.Errorf("Cannot creat a Directory %s. A File named %s already exists.", path.Identity, path.Identity)
 	}
 }
 
@@ -165,17 +168,17 @@ func (d *Directory) Search(path *Path) (Item, error) {
 	}
 
 	if item == nil {
-		return nil, errors.New(fmt.Sprintf("Item %s not found.", path.Identity))
+		return nil, fmt.Errorf("Item %s not found.", path.Identity)
 	}
 
 	if subdir, ok := item.(*Directory); ok {
 		return subdir.Search(path.Next) // go recurse
 	} else {
-		return nil, errors.New(fmt.Sprintf("Item %s is not a Directory. Cannot go deeper.", path.Identity))
+		return nil, fmt.Errorf("Item %s is not a Directory. Cannot go deeper.", path.Identity)
 	}
 }
 
-// Search an File that has the given path
+// Search a File that has the given path
 func (d *Directory) SearchFile(path *Path) (*File, error) {
 	item, err := d.Search(path)
 	if err != nil {
@@ -185,6 +188,20 @@ func (d *Directory) SearchFile(path *Path) (*File, error) {
 	if file, ok := item.(*File); ok {
 		return file, nil
 	} else {
-		return nil, errors.New(fmt.Sprintf("%s is not a File, but a Directory.", path.Identity))
+		return nil, fmt.Errorf("%s is not a File, but a Directory.", path.Identity)
+	}
+}
+
+// Search a Directory that has the given path
+func (d *Directory) SearchDirectory(path *Path) (*Directory, error) {
+	item, err := d.Search(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if directory, ok := item.(*Directory); ok {
+		return directory, nil
+	} else {
+		return nil, fmt.Errorf("%s is not a Directory, but a File.", path.Identity)
 	}
 }

@@ -1,7 +1,6 @@
 package gvfs
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -16,7 +15,7 @@ func Traverse(path string, ignore *regexp.Regexp) (*Directory, error) {
 	if info, err := os.Stat(path); err != nil {
 		return nil, err
 	} else if !info.IsDir() {
-		return nil, errors.New(fmt.Sprintf("%s is not a directory.", path))
+		return nil, fmt.Errorf("%s is not a directory.", path)
 	}
 
 	d, err := traverse(path, ignore)
