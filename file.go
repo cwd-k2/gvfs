@@ -54,5 +54,5 @@ func (f *File) Write(b []byte) (int, error) {
 
 // Read File contents to the given []byte
 func (f *File) Read(b []byte) (int, error) {
-	return bytes.NewBuffer(b).Write(f.Contents)
+	return bytes.NewBuffer(f.Contents).Read(b)
 }
