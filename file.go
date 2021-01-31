@@ -49,10 +49,12 @@ func (f *File) Name() string {
 
 // Write the given []byte to the File
 func (f *File) Write(b []byte) (int, error) {
-	return bytes.NewBuffer(f.Contents).Write(b)
+	f.Contents = append(f.Contents, b...)
+	return len(b), nil
 }
 
 // Read File contents to the given []byte
 func (f *File) Read(b []byte) (int, error) {
-	return bytes.NewBuffer(f.Contents).Read(b)
+	b = f.Contents[:len(b)]
+	return len(b), nil
 }
