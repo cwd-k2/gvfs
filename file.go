@@ -2,6 +2,7 @@ package gvfs
 
 import (
 	"bytes"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -9,6 +10,7 @@ import (
 type File struct {
 	BaseName string
 	Contents []byte
+	byteread int64
 }
 
 func NewFile(basename string) *File {
@@ -48,13 +50,19 @@ func (f *File) Name() string {
 }
 
 // Write the given []byte to the File
-// func (f *File) Write(b []byte) (int, error) {
-// 	f.Contents = append(f.Contents, b...)
-// 	return len(b), nil
-// }
+func (f *File) Write(b []byte) (int, error) {
+	// Write all
+	f.Contents = append(f.Contents, b...)
+	return len(b), nil
+}
 
 // Read File contents to the given []byte
-// func (f *File) Read(b []byte) (int, error) {
-// 	b = f.Contents[:len(b)]
-// 	return len(b), nil
-// }
+func (f *File) Read(b []byte) (int, error) {
+	if f.byteread >= int64(len(f.Contents)) {
+		return 0, io.EOF
+	}
+	// no transfer, just copy
+	n := copy(b, f.Contents[f.byteread:])
+	f.byteread += int64(n)
+	return n, nil
+}

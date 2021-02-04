@@ -14,7 +14,7 @@ type Directory struct {
 func NewDirectory(basename string) *Directory {
 	return &Directory{
 		BaseName: basename,
-		Contents: make([]Item, 0),
+		Contents: []Item{},
 	}
 }
 
