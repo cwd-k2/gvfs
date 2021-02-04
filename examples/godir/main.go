@@ -20,7 +20,7 @@ func main() {
 		panic(err)
 	}
 
-	basename, dirname := filepath.Split(target)
+	dirname, basename := filepath.Split(target)
 
 	newfiles := []string{
 		"README.md",
