@@ -27,48 +27,39 @@ func Traverse(path string, ignore *regexp.Regexp) (*Directory, error) {
 }
 
 func traverse(path string, ignore *regexp.Regexp) (*Directory, error) {
-	matched, err := filepath.Glob(filepath.Join(path, "*"))
+	children, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, err
 	}
 
 	contents := make([]Item, 0)
 
-	for _, child := range matched {
-		if ignore != nil && ignore.MatchString(child) {
+	for _, child := range children {
+		// FileInfo.Name() returns the base name
+		name := filepath.Join(path, child.Name())
+
+		if ignore != nil && ignore.MatchString(name) {
 			continue
 		}
 
-		info, err := os.Stat(child)
-		if err != nil {
-			println(err.Error())
-			continue
-		}
-
-		if info.Mode().IsDir() {
-			d, err := traverse(child, ignore)
-
+		// Directory, RegularFile
+		// TODO: what about SymLink?
+		if child.Mode().IsDir() {
+			// recursively traverse
+			d, err := traverse(name, ignore)
 			if err != nil {
 				println(err.Error())
 				continue
 			}
-
 			contents = append(contents, d)
-		} else if info.Mode().IsRegular() {
-			fp, err := os.Open(child)
+		} else if child.Mode().IsRegular() {
+			// read contents directly
+			b, err := ioutil.ReadFile(name)
 			if err != nil {
 				println(err.Error())
 				continue
 			}
-			defer fp.Close()
-
-			b, err := ioutil.ReadFile(child)
-			if err != nil {
-				println(err.Error())
-				continue
-			}
-			f := &File{BaseName: filepath.Base(child), Contents: b}
-
+			f := &File{BaseName: child.Name(), Contents: b}
 			contents = append(contents, f)
 		}
 	}
